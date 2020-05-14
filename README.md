@@ -1,5 +1,5 @@
 # Minesweeper
-##Python 3 / pygame implementation of minesweeper
+## Python 3 / pygame implementation of minesweeper
 
 
 
