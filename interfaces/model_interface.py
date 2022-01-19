@@ -31,7 +31,7 @@ __maintainer__ = "Kasper van Maasdam"
 __email__ = "kaspervanm@gmail.com"
 __status__ = "Development"
 
-lib = CDLL("C:\Users\maasd\OneDrive\Documenten\VSC\Python\Minesweeper-1\interfaces\DLL\NNModel.dll")
+lib = CDLL("interfaces/DLL/NNModel.dll")
 
 
 class Model(object):
