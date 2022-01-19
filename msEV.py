@@ -23,7 +23,6 @@ survivorCount = int(modelCount * 0.20)
 saverequirementratio = 0.95
 gamespacer = 5
 cycleCounter = 0
-top_score_ratio = []
 seed = 0
 shape = [81, 5, 1]
 actFuncts = [4, 2]
@@ -31,9 +30,9 @@ mutationRate = 0.5
 mutationDegree = 0.25
 objects = []
 for i in range(modelCount):
-    # boxes, blocksleft, checkedBoxes, fitness, gamecount
+    # boxes, blocksleft, checkedBoxes, fitness, gamecount, model, clickCounter
     objects.append([[], 0, [], 0, 0, Model(
-        seed + i, len(shape), shape, actFuncts)])
+        seed + i, len(shape), shape, actFuncts), 0])
 print(objects)
 
 #load_model(models[0][0], "saves/model1-2021-10-08_07-41-36.dat")
@@ -46,6 +45,16 @@ for a in actFuncts:
     name += str(a) + "-"
 name = name[:-1]
 fname = datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + name
+
+with open("Data/" + fname + "_LOG.txt", "a+") as f:
+    f.write(
+        name
+        + "\n"
+        + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        + "\t"
+        + str(cycleCounter)
+        + f"\tto save:  {int(saverequirementratio)}, pool size = {modelCount}, survivor count = {survivorCount}, games per cycle = {gamespacer}, mutation rate = {mutationRate}, mutation degree = {mutationDegree}"
+    )
 
 
 def save(m1, top=False):
@@ -65,7 +74,6 @@ def getMutations(survivors):
     print(top)
 
     print("Top scores: ", [t[1] for t in top])
-    top_score_ratio.append(top[0][1] / gamespacer)
 
     with open("Data/" + fname + "_LOG.txt", "a+") as f:
         f.write(
@@ -81,9 +89,9 @@ def getMutations(survivors):
         save(top[0][0], True)
         exit(0)
 
-    newModels = []
+    #newModels = []
     for index in range(survivors):
-        newModels.append([top[index][0], 0, [], 0, 0])
+        #newModels.append([top[index][0], 0, [], 0, 0])
         newCount = modelCount - survivors
         for i in range(int(newCount / survivors + 0.5)):
             newModels.append(
@@ -180,7 +188,7 @@ for obj in objects:
 
 def pickBombs(obj):
     numBombs = 0
-    while numBombs < 81:   # CHange to 10
+    while numBombs < 10:   # CHange to 10
         x = randrange(0, len(obj[0]))
         if not obj[0][x].isBomb:
             obj[0][x].isBomb = True
@@ -328,6 +336,7 @@ def resetGame(obj):
     obj[0][:] = []
     obj[1] = 0
     obj[2] = []
+    obj[6] = 0
     drawBoxesInit(obj)
     pickBombs(obj)
 
@@ -335,7 +344,6 @@ def resetGame(obj):
 while True:
     surfObj.fill(white)
 
-    print(1)
     drawBox()
     drawBoxes()
 
@@ -345,34 +353,40 @@ while True:
             sys.exit()
 
     for index, obj in enumerate(objects):
-        boxes1d = []
-        for b in obj[0]:
-            boxes1d.append(b.flag)
+        if not obj[4] == 5:
+            boxes1d = []
+            for b in obj[0]:
+                boxes1d.append(b.flag)
 
-        # process
+            # process
 
-        output = feedforward(obj[5][0], boxes1d)[0]
-        output *= 81
-        coords = [int(output % 9), int(output // 9)]
+            output = feedforward(obj[5], boxes1d)[0]
+            output *= 81
+            coords = [int(output % 9), int(output // 9)]
+            obj[6] += 1
+            if obj[6] == 80:
+                lose(obj)
 
-        print(index, ": ", obj[1], ", ", coords)
+            #print(index, ": ", obj[1], ", ", coords)
 
-        for b in obj[0]:
-            if [b.x, b.y] == coords:
-                selBlock = b
-                break
+            for b in obj[0]:
+                if [b.x, b.y] == coords:
+                    selBlock = b
+                    break
 
-        selBlock.flag = getWarn(obj[0], selBlock)
-        if selBlock.flag == 0:
-            boxesToPath.append(selBlock)
-            pathFind(obj, selBlock)
-        if selBlock.isBomb:
-            selBlock.flag = 9
+            selBlock.flag = getWarn(obj[0], selBlock)
+            if selBlock.flag == 0:
+                boxesToPath.append(selBlock)
+                pathFind(obj, selBlock)
+            if selBlock.isBomb:
+                selBlock.flag = 9
 
-        if selBlock.flag == -3:
-            surfObj.blit(blockSurfSel, selBlock.boxP)
-    print([obj[4] == gamespacer for obj in objects])
+            if selBlock.flag == -3:
+                surfObj.blit(blockSurfSel, selBlock.boxP)
+
     if all([obj[4] == gamespacer for obj in objects]):
+        cycleCounter += 1
+        print("MUTATE_--------------------")
         getMutations(survivorCount)
 
     pygame.display.update()

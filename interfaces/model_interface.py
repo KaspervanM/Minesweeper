@@ -227,7 +227,7 @@ def freeModel(models):
     models (list of Model objects): The models to be freed.
     """
     for model in models:
-        lib.freeOutM(model[0].obj)
+        lib.freeOutM(model.obj)
 
 
 def feedforward(model, inp):
