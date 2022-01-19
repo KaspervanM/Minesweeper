@@ -3,6 +3,97 @@ import sys
 from random import randrange
 from pygame.locals import *
 from ctypes import windll
+from datetime import datetime
+from interfaces.model_interface import (
+    Model,
+    feedforward,
+    freeModel,
+    getMutated,
+    train_from_array,
+    save_model,
+    load_model,
+)
+
+
+modelCount = 50
+survivorCount = int(modelCount * 0.20)
+saverequirementratio = 0.95
+gamespacer = 5
+cycleCounter = 0
+top_score_ratio = []
+objects = []
+
+# Initialize models
+seed = 0
+shape = [4, 1]
+actFuncts = [4]
+mutationRate = 0.5
+mutationDegree = 0.25
+models = []
+for i in range(modelCount):
+    models.append([Model(seed + i, len(shape), shape, actFuncts), 0, True])
+#load_model(models[0][0], "saves/model1-2021-10-08_07-41-36.dat")
+
+name = "_seed%d_s" % seed
+for s in shape:
+    name += str(s) + "-"
+name = name[:-1] + "_a"
+for a in actFuncts:
+    name += str(a) + "-"
+name = name[:-1]
+fname = datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + name
+
+
+def save(m1, top=False):
+    filename_end = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    if top:
+        filename_end += "_TOP"
+    save_model(m1, "saves/model1-" + filename_end + ".dat")
+    print("Saved")
+
+
+def getMutations(survivors):
+    top_ = sorted(models, key=lambda x: x[1], reverse=True)
+    top = top_[:survivors]
+    freeModel(top_[survivors:])
+
+    print("Top scores: ", [t[1] for t in top])
+    top_score_ratio.append(top[0][1] / gamespacer)
+
+    with open("Data/" + fname + "_LOG.txt", "a+") as f:
+        f.write(
+            datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            + "\t"
+            + str(cycleCounter)
+            + "\t["
+            + ",".join([str(t[1]) for t in top])
+            + "]\n"
+        )
+
+    if top[0][1] >= int(saverequirementratio * gamespacer):
+        save(top[0][0], True)
+        exit(0)
+
+    newModels = []
+    for index in range(survivors):
+        newModels.append([top[index][0], 0, True])
+        newCount = modelCount - survivors
+        for i in range(int(newCount / survivors + 0.5)):
+            newModels.append(
+                [
+                    Model(
+                        obj=getMutated(
+                            top[index][0],
+                            seed + index + i,
+                            mutationRate,
+                            mutationDegree,
+                        )
+                    ),
+                    0,
+                    True,
+                ]
+            )
+    return newModels[:modelCount]
 
 
 def MessageBox(title, text, style):

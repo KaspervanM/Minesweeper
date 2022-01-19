@@ -4,6 +4,48 @@ from random import randrange
 from pygame.locals import *
 from ctypes import windll
 
+from datetime import datetime
+from interfaces.model_interface import (
+    Model,
+    feedforward,
+    freeModel,
+    getMutated,
+    train_from_array,
+    save_model,
+    load_model,
+)
+
+# Initialize models
+seed = 0
+shape = [4, 1]
+actFuncts = [4]
+model = Model(seed, len(shape), shape, actFuncts)
+# load_model(model, "saves/model-2021-09-12_10-08-18_TOP.dat")
+
+model_tracker = []
+model_training = []
+model_training_total = []
+
+its = 1
+lr = 0.5
+dataThinner = 1  # 2^x times smaller td
+name = "_seed%d_s" % seed
+for s in shape:
+    name += str(s) + "-"
+name = name[:-1] + "_a"
+for a in actFuncts:
+    name += str(a) + "-"
+name = name[:-1] + "_lr%f" % lr
+print(name)
+
+
+def save(m1, top=False):
+    filename_end = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    if top:
+        filename_end += "_TOP"
+    save_model(m1, "saves/model-" + filename_end + ".dat")
+    print("Saved")
+
 
 def MessageBox(title, text, style):
     return windll.user32.MessageBoxW(0, text, title, style)
@@ -322,13 +364,19 @@ while True:
                         selBlock.flag = -3
                         """
 
+    # Input data
     boxes1d = []
     for box in boxes:
         boxes1d.append(box.flag)
 
-    # process
-
-    output = [1, 1]
+    # Process
+    output = feedforward(model, boxes1d)
+    model_tracker.append(
+        [
+            boxes1d,
+            #            [float(int(output + 0.5))],  --- INCORRECT
+        ]
+    )
 
     for box in boxes:
         if [box.x, box.y] == output:
