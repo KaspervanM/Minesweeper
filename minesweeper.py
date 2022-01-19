@@ -11,7 +11,6 @@ def MessageBox(title, text, style):
 
 
 pygame.init()
-fps = pygame.time.Clock()
 bomb = pygame.image.load("bomb.png")
 pygame.display.set_icon(bomb)
 surfObj = pygame.display.set_mode((173, 200))
@@ -120,6 +119,7 @@ def drawBoxes():
             lose()
         elif b.flag == -2:
             surfObj.blit(flag, b.boxP)
+            blocksLeft += 1
             flagsUsed += 1
         elif b.flag == -1:
             surfObj.blit(question, b.boxP)
@@ -243,14 +243,12 @@ def win():
 
 
 def resetGame():
-    global fps
     global boxes
     global numBombs
     global flagsUsed
     global checkedBoxes
     global blocksLeft
     global lastGame
-    fps = pygame.time.Clock()
     boxes[:] = []
     numBombs = 0
     drawBoxesInit()
@@ -325,4 +323,4 @@ while True:
         surfObj.blit(blockSurfSel, selBlock.boxP)
 
     pygame.display.update()
-    fps.tick(30)
+    pygame.time.Clock().tick(30)
