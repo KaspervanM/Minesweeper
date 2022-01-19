@@ -277,6 +277,12 @@ while True:
                     if selBlock.flag == -3: selBlock.flag = -2
                     elif selBlock.flag == -2: selBlock.flag = -1
                     elif selBlock.flag == -1: selBlock.flag = -3
+                
+                for box in boxes:
+                    
+                    print("(", box.x, " ", box.y, ") ",
+                          box.flag, " ", box.isBomb)
+                print("-----------------")
     if selBlock.flag == -3: surfObj.blit(blockSurfSel, selBlock.boxP)
     
     pygame.display.update()
