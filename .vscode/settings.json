@@ -1,3 +1,10 @@
 {
-  "python.formatting.provider": "autopep8"
+  "python.formatting.provider": "autopep8",
+  "python.linting.pylintEnabled": true,
+  "python.linting.enabled": true,
+  "python.linting.pylintArgs": ["--extension-pkg-whitelist=pygame"],
+  "python.linting.banditEnabled": false,
+  "python.linting.flake8Enabled": false,
+  "python.linting.mypyEnabled": false,
+  "python.linting.pylamaEnabled": false
 }
