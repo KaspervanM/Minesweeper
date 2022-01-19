@@ -1,7 +1,8 @@
 """Trains AI to play minesweeper using an evolutionary algorithm
 """
+from asyncio.windows_events import NULL
 import sys
-from random import randrange
+from random import randrange, seed
 from ctypes import windll
 from operator import itemgetter
 from datetime import datetime
@@ -15,9 +16,10 @@ from interfaces.model_interface import (
     save_model,
 )
 
+seed(1)
 
 # Initialize models
-MODEL_COUNT = 5
+MODEL_COUNT = 10
 SURVIVOR_COUNT = int(MODEL_COUNT * 0.20)
 SAVE_REQUIREMENT_RATIO = 0.95
 GAME_SPACER = 5
@@ -33,6 +35,7 @@ for i in range(MODEL_COUNT):
     OBJECTS.append([[], 0, [], 0, 0, Model(
         SEED + i, len(SHAPE), SHAPE, ACT_FUNCTS), 0])
 print(OBJECTS)
+print(len(OBJECTS))
 
 #load_model(models[0][0], "saves/model1-2021-10-08_07-41-36.dat")
 
@@ -192,40 +195,40 @@ def pick_bombs(obj):
             num_bombs += 1
 
 
-def draw_boxes():
-    for obj in OBJECTS:
-        obj[1] = 0
-        for b in obj[0]:
-            if b.flag == -3:
-                obj[1] += 1
-                surfObj.blit(blockSurf, b.box_pos)
-            elif b.flag == 0:
-                if not b in obj[2]:
-                    path_find(obj, b)
-                surfObj.blit(blockSurfBlank, b.box_pos)
-            elif b.flag == 9:
-                surfObj.blit(explode, b.box_pos)
-                lose(obj)
-            elif b.flag == -1:
-                surfObj.blit(question, b.box_pos)
-            elif b.flag == 1:
-                surfObj.blit(warn1, b.box_pos)
-            elif b.flag == 2:
-                surfObj.blit(warn2, b.box_pos)
-            elif b.flag == 3:
-                surfObj.blit(warn3, b.box_pos)
-            elif b.flag == 4:
-                surfObj.blit(warn4, b.box_pos)
-            elif b.flag == 5:
-                surfObj.blit(warn5, b.box_pos)
-            elif b.flag == 6:
-                surfObj.blit(warn6, b.box_pos)
-            elif b.flag == 7:
-                surfObj.blit(warn7, b.box_pos)
-            elif b.flag == 8:
-                surfObj.blit(warn8, b.box_pos)
-        if obj[1] == 10:
-            win(obj)
+def draw_boxes(obj):
+    obj[1] = 0
+    for b in obj[0]:
+        if b.flag == -3:
+            obj[1] += 1
+            surfObj.blit(blockSurf, b.box_pos)
+        elif b.flag == 0:
+            if not b in obj[2]:
+                path_find(obj, b)
+            surfObj.blit(blockSurfBlank, b.box_pos)
+        elif b.flag == 9:
+            surfObj.blit(explode, b.box_pos)
+            lose(obj)
+            return
+        elif b.flag == -1:
+            surfObj.blit(question, b.box_pos)
+        elif b.flag == 1:
+            surfObj.blit(warn1, b.box_pos)
+        elif b.flag == 2:
+            surfObj.blit(warn2, b.box_pos)
+        elif b.flag == 3:
+            surfObj.blit(warn3, b.box_pos)
+        elif b.flag == 4:
+            surfObj.blit(warn4, b.box_pos)
+        elif b.flag == 5:
+            surfObj.blit(warn5, b.box_pos)
+        elif b.flag == 6:
+            surfObj.blit(warn6, b.box_pos)
+        elif b.flag == 7:
+            surfObj.blit(warn7, b.box_pos)
+        elif b.flag == 8:
+            surfObj.blit(warn8, b.box_pos)
+    if obj[1] == 10:
+        win(obj)
 
 
 def box_at(boxes, x, y):
@@ -311,7 +314,8 @@ def lose(obj):
 
 
 def win(obj):
-    message_box("Congrats, you won!", "You win!  " + str(obj[1]), 0)
+    print("win!")
+    #message_box("Congrats, you won!", "You win!  " + str(obj[1]), 0)
     obj[3] += (81 - 10 - obj[1]) / GAME_SPACER  # fitness
     obj[4] += 1
     resetGame(obj)
@@ -333,7 +337,6 @@ while True:
     surfObj.fill(white)
 
     draw_box()
-    draw_boxes()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -341,7 +344,8 @@ while True:
             sys.exit()
 
     for index, objec in enumerate(OBJECTS):
-        if not objec[4] == 5:
+        draw_boxes(objec)
+        if objec[4] < 5:
             boxes1d = []
             for box_elem in objec[0]:
                 boxes1d.append(box_elem.flag)
@@ -354,30 +358,34 @@ while True:
             objec[6] += 1
             if objec[6] == 81 - 20:
                 lose(objec)
+            else:
+                #print(index, ": ", obj[1], ", ", coords)
 
-            #print(index, ": ", obj[1], ", ", coords)
+                for box_elem in objec[0]:
+                    if [box_elem.x, box_elem.y] == coords:
+                        selBlock = box_elem
+                        break
 
-            for box_elem in objec[0]:
-                if [box_elem.x, box_elem.y] == coords:
-                    selBlock = box_elem
-                    break
+                selBlock.flag = get_warn(objec[0], selBlock)
+                if selBlock.flag == 0:
+                    boxesToPath.append(selBlock)
+                    path_find(objec, selBlock)
+                if selBlock.isBomb:
+                    selBlock.flag = 9
 
-            selBlock.flag = get_warn(objec[0], selBlock)
-            if selBlock.flag == 0:
-                boxesToPath.append(selBlock)
-                path_find(objec, selBlock)
-            if selBlock.isBomb:
-                selBlock.flag = 9
+                if selBlock.flag == -3:
+                    surfObj.blit(blockSurfSel, selBlock.box_pos)
 
-            if selBlock.flag == -3:
-                surfObj.blit(blockSurfSel, selBlock.box_pos)
+            #done = sum([1 if obj[4] == GAME_SPACER else 0 for obj in OBJECTS])
+            #print("done: ", done)
+            # if done == 9:
+            #    print([obj if obj[4] != GAME_SPACER else NULL for obj in OBJECTS])
+        elif all([obj[4] == GAME_SPACER for obj in OBJECTS]):
+            CYCLE_COUNTER += 1
+            print("MUTATE_--------------------")
+            OBJECTS = get_mutations(SURVIVOR_COUNT)
+            for objec in OBJECTS:
+                resetGame(objec)
 
-    if all([obj[4] == GAME_SPACER for obj in OBJECTS]):
-        CYCLE_COUNTER += 1
-        print("MUTATE_--------------------")
-        OBJECTS = get_mutations(SURVIVOR_COUNT)
-        for objec in OBJECTS:
-            resetGame(objec)
-
-    pygame.display.update()
+    # pygame.display.update()
     # pygame.time.Clock().tick(30)
