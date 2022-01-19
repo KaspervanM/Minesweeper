@@ -2,7 +2,8 @@ import pygame
 import sys
 from random import randrange
 from pygame.locals import *
-from ctypes import windll
+from ctypes import c_int, WINFUNCTYPE, windll
+from ctypes.wintypes import HWND, LPCSTR, UINT
 
 
 def MessageBox(title, text, style):
@@ -299,7 +300,7 @@ while True:
         if e.type == QUIT:
             pygame.quit()
             sys.exit()
-        """elif e.type == MOUSEMOTION:
+        elif e.type == MOUSEMOTION:
             selBlock = overBlock()
             if not isInBounds():
 
@@ -320,28 +321,6 @@ while True:
                         selBlock.flag = -1
                     elif selBlock.flag == -1:
                         selBlock.flag = -3
-                        """
-
-    boxes1d = []
-    for box in boxes:
-        boxes1d.append(box.flag)
-
-    # process
-
-    output = [1, 1]
-
-    for box in boxes:
-        if [box.x, box.y] == output:
-            selBlock = box
-            break
-
-    selBlock.flag = getWarn(selBlock)
-    if selBlock.flag == 0:
-        boxesToPath.append(selBlock)
-        pathFind(selBlock)
-    if selBlock.isBomb:
-        selBlock.flag = 9
-
     if selBlock.flag == -3:
         surfObj.blit(blockSurfSel, selBlock.boxP)
 
