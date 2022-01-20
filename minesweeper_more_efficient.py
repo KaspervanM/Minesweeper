@@ -11,7 +11,7 @@ def MessageBox(title, text, style):
 
 
 pygame.init()
-bomb = pygame.image.load("bomb.png")
+bomb = pygame.image.load("resources/bomb.png")
 pygame.display.set_icon(bomb)
 surfObj = pygame.display.set_mode((173, 200))
 pygame.display.set_caption("Minesweeper")
@@ -23,25 +23,25 @@ blue = pygame.Color(0, 0, 255)
 white = pygame.Color(255, 255, 255)
 black = pygame.Color(0, 0, 0)
 
-font = pygame.font.Font("UniversLTStd-BoldEx.otf", 18)
+font = pygame.font.Font("resources/UniversLTStd-BoldEx.otf", 18)
 
-blockSurf = pygame.image.load("block.png")
-blockSurfSel = pygame.image.load("selblock.png")
-blockSurfBlank = pygame.image.load("blankblock.png")
+blockSurf = pygame.image.load("resources/block.png")
+blockSurfSel = pygame.image.load("resources/selblock.png")
+blockSurfBlank = pygame.image.load("resources/blankblock.png")
 
-warn1 = pygame.image.load("block1.png")
-warn2 = pygame.image.load("block2.png")
-warn3 = pygame.image.load("block3.png")
-warn4 = pygame.image.load("block4.png")
-warn5 = pygame.image.load("block5.png")
-warn6 = pygame.image.load("block6.png")
-warn7 = pygame.image.load("block7.png")
-warn8 = pygame.image.load("block8.png")
-explode = pygame.image.load("explode.png")
-flag = pygame.image.load("flag.png")
-question = pygame.image.load("question.png")
+warn1 = pygame.image.load("resources/block1.png")
+warn2 = pygame.image.load("resources/block2.png")
+warn3 = pygame.image.load("resources/block3.png")
+warn4 = pygame.image.load("resources/block4.png")
+warn5 = pygame.image.load("resources/block5.png")
+warn6 = pygame.image.load("resources/block6.png")
+warn7 = pygame.image.load("resources/block7.png")
+warn8 = pygame.image.load("resources/block8.png")
+explode = pygame.image.load("resources/explode.png")
+flag = pygame.image.load("resources/flag.png")
+question = pygame.image.load("resources/question.png")
 
-clock = pygame.image.load("time.png")
+clock = pygame.image.load("resources/time.png")
 
 boxes = []
 numBombs = 0
