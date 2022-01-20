@@ -1,47 +1,45 @@
-import pygame
+import pygame as pg
 import sys
 from random import randrange
 from pygame.locals import *
-from ctypes import c_int, WINFUNCTYPE, windll
-from ctypes.wintypes import HWND, LPCSTR, UINT
+from ctypes import windll
 
 
 def MessageBox(title, text, style):
     return windll.user32.MessageBoxW(0, text, title, style)
 
 
-pygame.init()
-bomb = pygame.image.load("bomb.png")
-pygame.display.set_icon(bomb)
-surfObj = pygame.display.set_mode((173, 200))
-pygame.display.set_caption("Minesweeper")
+pg.init()
+mine = pg.image.load("images/mine.png")
+pg.display.set_icon(pg.image.load("images/icon.png"))
+surfObj = pg.display.set_mode((173, 200))
+pg.display.set_caption("Minesweeper")
 
-red = pygame.Color(255, 0, 0)
-green = pygame.Color(0, 255, 0)
+red = pg.Color(255, 0, 0)
+green = pg.Color(0, 255, 0)
 
-blue = pygame.Color(0, 0, 255)
-white = pygame.Color(255, 255, 255)
-black = pygame.Color(0, 0, 0)
+blue = pg.Color(0, 0, 255)
+white = pg.Color(255, 255, 255)
+black = pg.Color(0, 0, 0)
 
-font = pygame.font.Font("UniversLTStd-BoldEx.otf", 18)
+font = pg.font.Font("UniversLTStd-BoldEx.otf", 18)
 
-blockSurf = pygame.image.load("block.png")
-blockSurfSel = pygame.image.load("selblock.png")
-blockSurfBlank = pygame.image.load("blankblock.png")
+blockSurf = pg.image.load("images/block.png")
+blockSurfBlank = pg.image.load("images/blankblock.png")
 
-warn1 = pygame.image.load("block1.png")
-warn2 = pygame.image.load("block2.png")
-warn3 = pygame.image.load("block3.png")
-warn4 = pygame.image.load("block4.png")
-warn5 = pygame.image.load("block5.png")
-warn6 = pygame.image.load("block6.png")
-warn7 = pygame.image.load("block7.png")
-warn8 = pygame.image.load("block8.png")
-explode = pygame.image.load("explode.png")
-flag = pygame.image.load("flag.png")
-question = pygame.image.load("question.png")
+warn1 = pg.image.load("images/block1.png")
+warn2 = pg.image.load("images/block2.png")
+warn3 = pg.image.load("images/block3.png")
+warn4 = pg.image.load("images/block4.png")
+warn5 = pg.image.load("images/block5.png")
+warn6 = pg.image.load("images/block6.png")
+warn7 = pg.image.load("images/block7.png")
+warn8 = pg.image.load("images/block8.png")
+explode = pg.image.load("images/explode.png")
+flag = pg.image.load("images/flag.png")
+question = pg.image.load("images/question.png")
 
-clock = pygame.image.load("time.png")
+clock = pg.image.load("images/time.png")
 
 boxes = []
 numBombs = 0
@@ -66,10 +64,10 @@ selBlock = refBlock
 
 
 def drawBox():
-    pygame.draw.line(surfObj, black, (10, 10), (163, 10))
-    pygame.draw.line(surfObj, black, (10, 10), (10, 163))
-    pygame.draw.line(surfObj, black, (10, 163), (163, 163))
-    pygame.draw.line(surfObj, black, (163, 10), (163, 163))
+    pg.draw.line(surfObj, black, (10, 10), (163, 10))
+    pg.draw.line(surfObj, black, (10, 10), (10, 163))
+    pg.draw.line(surfObj, black, (10, 163), (163, 163))
+    pg.draw.line(surfObj, black, (163, 10), (163, 163))
 
 
 def drawBoxesInit():
@@ -220,13 +218,13 @@ def resetGame():
     flagsUsed = 0
     checkedBoxes = []
     blocksLeft = 0
-    lastGame = pygame.time.get_ticks()
+    lastGame = pg.time.get_ticks()
 
 
 while True:
     surfObj.fill(white)
     surfObj.blit(clock, (10, 173))
-    surfObj.blit(bomb, (147, 173))
+    surfObj.blit(mine, (147, 173))
 
     m = font.render(str(10-flagsUsed), True, black)
     mp = m.get_rect()
@@ -234,11 +232,11 @@ while True:
     surfObj.blit(m, mp)
     ticks = 0
     if not lastGame == 0:
-        mins = (pygame.time.get_ticks() - lastGame) / 1000 / 60
-        secs = (pygame.time.get_ticks() - lastGame) / 1000 % 60
+        mins = (pg.time.get_ticks() - lastGame) / 1000 / 60
+        secs = (pg.time.get_ticks() - lastGame) / 1000 % 60
     else:
-        mins = pygame.time.get_ticks() / 1000 / 60
-        secs = pygame.time.get_ticks() / 1000 % 60
+        mins = pg.time.get_ticks() / 1000 / 60
+        secs = pg.time.get_ticks() / 1000 % 60
     minsS = ""
     secsS = ""
     if secs < 10:
@@ -258,9 +256,9 @@ while True:
     drawBox()
     drawBoxes()
 
-    for e in pygame.event.get():
+    for e in pg.event.get():
         if e.type == QUIT:
-            pygame.quit()
+            pg.quit()
             sys.exit()
         elif e.type == MOUSEMOTION:
             selBlock = overBlock()
@@ -283,8 +281,6 @@ while True:
                         selBlock.flag = -1
                     elif selBlock.flag == -1:
                         selBlock.flag = -3
-    if selBlock.flag == -3:
-        surfObj.blit(blockSurfSel, selBlock.boxP)
 
-    pygame.display.update()
-    pygame.time.Clock().tick(30)
+    pg.display.update()
+    pg.time.Clock().tick(30)
