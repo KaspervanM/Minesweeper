@@ -54,8 +54,8 @@ with open("Data/" + fname + "_LOG.txt", "a+", encoding="utf8") as f:
         + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         + "\t"
         + str(CYCLE_COUNTER)
-        + f"\tto save:  {(SAVE_REQUIREMENT_RATIO * 81)}, pool size = {MODEL_COUNT},\
-survivor count = {SURVIVOR_COUNT}, games per cycle = {GAME_SPACER},\
+        + f"\tto save:  {(SAVE_REQUIREMENT_RATIO * (81 - 10))}, pool size = {MODEL_COUNT}, \
+survivor count = {SURVIVOR_COUNT}, games per cycle = {GAME_SPACER}, \
 mutation rate = {MUTATION_RATE}, mutation degree = {MUTATION_DEGREE}\n"
     )
 
