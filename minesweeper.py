@@ -10,8 +10,8 @@ def MessageBox(title, text, style):
 
 
 pg.init()
-mine = pg.image.load("resources/mine.png")
-pg.display.set_icon(pg.image.load("resources/icon.png"))
+mine = pg.image.load("images/mine.png")
+pg.display.set_icon(pg.image.load("images/icon.png"))
 surfObj = pg.display.set_mode((173, 200))
 pg.display.set_caption("Minesweeper")
 
@@ -24,23 +24,22 @@ black = pg.Color(0, 0, 0)
 
 font = pg.font.Font("resources/UniversLTStd-BoldEx.otf", 18)
 
-blockSurf = pg.image.load("resources/block.png")
-blockSurfSel = pg.image.load("resources/selblock.png")
-blockSurfBlank = pg.image.load("resources/blankblock.png")
+blockSurf = pg.image.load("images/block.png")
+blockSurfBlank = pg.image.load("images/blankblock.png")
 
-warn1 = pg.image.load("resources/block1.png")
-warn2 = pg.image.load("resources/block2.png")
-warn3 = pg.image.load("resources/block3.png")
-warn4 = pg.image.load("resources/block4.png")
-warn5 = pg.image.load("resources/block5.png")
-warn6 = pg.image.load("resources/block6.png")
-warn7 = pg.image.load("resources/block7.png")
-warn8 = pg.image.load("resources/block8.png")
-explode = pg.image.load("resources/explode.png")
-flag = pg.image.load("resources/flag.png")
-question = pg.image.load("resources/question.png")
+warn1 = pg.image.load("images/block1.png")
+warn2 = pg.image.load("images/block2.png")
+warn3 = pg.image.load("images/block3.png")
+warn4 = pg.image.load("images/block4.png")
+warn5 = pg.image.load("images/block5.png")
+warn6 = pg.image.load("images/block6.png")
+warn7 = pg.image.load("images/block7.png")
+warn8 = pg.image.load("images/block8.png")
+explode = pg.image.load("images/explode.png")
+flag = pg.image.load("images/flag.png")
+question = pg.image.load("images/question.png")
 
-clock = pg.image.load("resources/time.png")
+clock = pg.image.load("images/time.png")
 
 boxes = []
 numBombs = 0
