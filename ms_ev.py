@@ -116,51 +116,28 @@ def message_box(title, text, style):
     return windll.user32.MessageBoxW(0, text, title, style)
 
 
-<<<<<<< HEAD
-pygame.init()
-bomb = pygame.image.load("resources/bomb.png")
-pygame.display.set_icon(bomb)
-surfObj = pygame.display.set_mode((173, 200))
-pygame.display.set_caption("Minesweeper")
-=======
 pg.init()
 mine = pg.image.load("images/mine.png")
 pg.display.set_icon(pg.image.load("images/icon.png"))
 surfObj = pg.display.set_mode((173, 200))
 pg.display.set_caption("Minesweeper")
->>>>>>> 6a696c5a7a81f498bcc31f24592184ce06cf26fd
 
 white = pg.Color(255, 255, 255)
 black = pg.Color(0, 0, 0)
 
-<<<<<<< HEAD
-blockSurf = pygame.image.load("resources/block.png")
-blockSurfSel = pygame.image.load("resources/selblock.png")
-blockSurfBlank = pygame.image.load("resources/blankblock.png")
+blockSurf = pg.image.load("resources/block.png")
+blockSurfSel = pg.image.load("resources/selblock.png")
+blockSurfBlank = pg.image.load("resources/blankblock.png")
 
-warn1 = pygame.image.load("resources/block1.png")
-warn2 = pygame.image.load("resources/block2.png")
-warn3 = pygame.image.load("resources/block3.png")
-warn4 = pygame.image.load("resources/block4.png")
-warn5 = pygame.image.load("resources/block5.png")
-warn6 = pygame.image.load("resources/block6.png")
-warn7 = pygame.image.load("resources/block7.png")
-warn8 = pygame.image.load("resources/block8.png")
-explode = pygame.image.load("resources/explode.png")
-=======
-blockSurf = pg.image.load("images/block.png")
-blockSurfBlank = pg.image.load("images/blankblock.png")
-
-warn1 = pg.image.load("images/block1.png")
-warn2 = pg.image.load("images/block2.png")
-warn3 = pg.image.load("images/block3.png")
-warn4 = pg.image.load("images/block4.png")
-warn5 = pg.image.load("images/block5.png")
-warn6 = pg.image.load("images/block6.png")
-warn7 = pg.image.load("images/block7.png")
-warn8 = pg.image.load("images/block8.png")
-explode = pg.image.load("images/explode.png")
->>>>>>> 6a696c5a7a81f498bcc31f24592184ce06cf26fd
+warn1 = pg.image.load("resources/block1.png")
+warn2 = pg.image.load("resources/block2.png")
+warn3 = pg.image.load("resources/block3.png")
+warn4 = pg.image.load("resources/block4.png")
+warn5 = pg.image.load("resources/block5.png")
+warn6 = pg.image.load("resources/block6.png")
+warn7 = pg.image.load("resources/block7.png")
+warn8 = pg.image.load("resources/block8.png")
+explode = pg.image.load("resources/explode.png")
 
 
 class Box():

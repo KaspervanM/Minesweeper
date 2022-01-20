@@ -9,19 +9,11 @@ def MessageBox(title, text, style):
     return windll.user32.MessageBoxW(0, text, title, style)
 
 
-<<<<<<< HEAD
-pygame.init()
-bomb = pygame.image.load("resources/bomb.png")
-pygame.display.set_icon(bomb)
-surfObj = pygame.display.set_mode((173, 200))
-pygame.display.set_caption("Minesweeper")
-=======
 pg.init()
-mine = pg.image.load("images/mine.png")
-pg.display.set_icon(pg.image.load("images/icon.png"))
+mine = pg.image.load("resources/mine.png")
+pg.display.set_icon(pg.image.load("resources/icon.png"))
 surfObj = pg.display.set_mode((173, 200))
 pg.display.set_caption("Minesweeper")
->>>>>>> 6a696c5a7a81f498bcc31f24592184ce06cf26fd
 
 red = pg.Color(255, 0, 0)
 green = pg.Color(0, 255, 0)
@@ -30,46 +22,25 @@ blue = pg.Color(0, 0, 255)
 white = pg.Color(255, 255, 255)
 black = pg.Color(0, 0, 0)
 
-<<<<<<< HEAD
-font = pygame.font.Font("resources/UniversLTStd-BoldEx.otf", 18)
+font = pg.font.Font("resources/UniversLTStd-BoldEx.otf", 18)
 
-blockSurf = pygame.image.load("resources/block.png")
-blockSurfSel = pygame.image.load("resources/selblock.png")
-blockSurfBlank = pygame.image.load("resources/blankblock.png")
+blockSurf = pg.image.load("resources/block.png")
+blockSurfSel = pg.image.load("resources/selblock.png")
+blockSurfBlank = pg.image.load("resources/blankblock.png")
 
-warn1 = pygame.image.load("resources/block1.png")
-warn2 = pygame.image.load("resources/block2.png")
-warn3 = pygame.image.load("resources/block3.png")
-warn4 = pygame.image.load("resources/block4.png")
-warn5 = pygame.image.load("resources/block5.png")
-warn6 = pygame.image.load("resources/block6.png")
-warn7 = pygame.image.load("resources/block7.png")
-warn8 = pygame.image.load("resources/block8.png")
-explode = pygame.image.load("resources/explode.png")
-flag = pygame.image.load("resources/flag.png")
-question = pygame.image.load("resources/question.png")
+warn1 = pg.image.load("resources/block1.png")
+warn2 = pg.image.load("resources/block2.png")
+warn3 = pg.image.load("resources/block3.png")
+warn4 = pg.image.load("resources/block4.png")
+warn5 = pg.image.load("resources/block5.png")
+warn6 = pg.image.load("resources/block6.png")
+warn7 = pg.image.load("resources/block7.png")
+warn8 = pg.image.load("resources/block8.png")
+explode = pg.image.load("resources/explode.png")
+flag = pg.image.load("resources/flag.png")
+question = pg.image.load("resources/question.png")
 
-clock = pygame.image.load("resources/time.png")
-=======
-font = pg.font.Font("UniversLTStd-BoldEx.otf", 18)
-
-blockSurf = pg.image.load("images/block.png")
-blockSurfBlank = pg.image.load("images/blankblock.png")
-
-warn1 = pg.image.load("images/block1.png")
-warn2 = pg.image.load("images/block2.png")
-warn3 = pg.image.load("images/block3.png")
-warn4 = pg.image.load("images/block4.png")
-warn5 = pg.image.load("images/block5.png")
-warn6 = pg.image.load("images/block6.png")
-warn7 = pg.image.load("images/block7.png")
-warn8 = pg.image.load("images/block8.png")
-explode = pg.image.load("images/explode.png")
-flag = pg.image.load("images/flag.png")
-question = pg.image.load("images/question.png")
-
-clock = pg.image.load("images/time.png")
->>>>>>> 6a696c5a7a81f498bcc31f24592184ce06cf26fd
+clock = pg.image.load("resources/time.png")
 
 boxes = []
 numBombs = 0
