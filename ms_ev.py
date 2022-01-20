@@ -308,17 +308,13 @@ while True:
 
             output = feedforward(objec[5], boxes1d)[0]
             output *= 81
-            coords = [int(output % 9), int(output // 9)]
+            coords = [int(output // 9 - .5), int(output % 9 - .5)]
             objec[6] += 1
             if objec[6] == 81 - 20:
                 lose(objec)
             else:
-                #print(index, ": ", obj[1], ", ", coords)
-
-                for box_elem in objec[0]:
-                    if [box_elem.x, box_elem.y] == coords:
-                        selBlock = box_elem
-                        break
+                #print(index, ": ", objec[1], ", ", coords)
+                selBlock = box_at(objec[0], coords[0], coords[1])
 
                 selBlock.flag = get_warn(objec[0], selBlock)
                 if selBlock.flag == 0:
@@ -330,16 +326,12 @@ while True:
                 if selBlock.flag == -3:
                     surfObj.blit(blockSurfSel, selBlock.box_pos)
 
-            #done = sum([1 if obj[4] == GAME_SPACER else 0 for obj in OBJECTS])
-            #print("done: ", done)
-            # if done == 9:
-            #    print([obj if obj[4] != GAME_SPACER else NULL for obj in OBJECTS])
-        elif all([obj[4] == GAME_SPACER for obj in OBJECTS]):
+        elif all(obj[4] == GAME_SPACER for obj in OBJECTS):
             CYCLE_COUNTER += 1
             print("MUTATE_--------------------")
             OBJECTS = get_mutations(SURVIVOR_COUNT)
-            for objec in OBJECTS:
-                resetGame(objec)
+            for obje in OBJECTS:
+                resetGame(obje)
 
-    # pygame.display.update()
+    pygame.display.update()
     # pygame.time.Clock().tick(30)
