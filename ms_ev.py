@@ -225,67 +225,27 @@ def box_at(boxes, x, y):
             return b
     return None
 
-# Make it not return None
-
 
 def warnInteger(boxes, b):
-    # try:
-    if b.x < 9 and b.x > 0 and b.y > 0 and b.y < 9:
-        return (box_at(boxes, b.x - 1, b.y), box_at(boxes, b.x + 1, b.y), box_at(boxes, b.x, b.y - 1), box_at(boxes, b.x, b.y + 1), box_at(boxes, b.x - 1, b.y - 1), box_at(boxes, b.x + 1, b.y + 1), box_at(boxes, b.x + 1, b.y - 1), box_at(boxes, b.x - 1, b.y + 1))
-    if b.x > 8 and b.y > 0 and b.y < 9:
-        return (box_at(boxes, b.x - 1, b.y), box_at(boxes, b.x - 1, b.y - 1), box_at(boxes, b.x - 1, b.y + 1))
-    if b.x < 1 and b.y > 0 and b.y < 9:
-        return (box_at(boxes, b.x + 1, b.y), box_at(boxes, b.x + 1, b.y - 1), box_at(boxes, b.x + 1, b.y + 1), box_at(boxes, b.x, b.y+1), box_at(boxes, b.x, b.y-1))
-    if b.y < 1 and b.x > 0 and b.x < 9:
-        return (box_at(boxes, b.x, b.y + 1), box_at(boxes, b.x + 1, b.y + 1), box_at(boxes, b.x-1, b.y), box_at(boxes, b.x+1, b.y), box_at(boxes, b.x-1, b.y+1))
-    if b.y == 0 and b.x == 0:
-        return (box_at(boxes, 1, 0), box_at(boxes, 1, 1), box_at(boxes, 0, 1))
-    # except Exception as msg:
-    return None
+    return (box_at(boxes, b.x - 1, b.y), box_at(boxes, b.x + 1, b.y), box_at(boxes, b.x, b.y - 1), box_at(boxes, b.x, b.y + 1), box_at(boxes, b.x - 1, b.y - 1), box_at(boxes, b.x + 1, b.y + 1), box_at(boxes, b.x + 1, b.y - 1), box_at(boxes, b.x - 1, b.y + 1))
 
 
 def get_warn(boxes, b):
     warn = 0
-    try:
-        neighbors = warnInteger(boxes, b)
-        if not neighbors:
-            return 0
-        for boxelem in neighbors:
-            try:
-                if boxelem and boxelem.isBomb:
-                    warn = warn + 1
-            except Exception as e:
-                print("Couldn't detect if neighbor is bomb..." + str(e))
-        return warn
-    except Exception as ee:
-        print("Couldn't find warn int..." + str(ee))
-        return warn
+    neighbors = warnInteger(boxes, b)
+    if not neighbors:
+        return 0
+    for boxelem in neighbors:
+        if boxelem and boxelem.isBomb:
+            warn += 1
+    return warn
 
 
 boxesToPath = []
 
-# replaced with 7 and 9 with 8
-
 
 def crossFind(boxes, b):
-    if b.x == 0 and b.y == 0:
-        return (box_at(boxes, 0, 1), box_at(boxes, 1, 0))
-    if b.x == 0 and b.y == 8:
-        return (box_at(boxes, 0, 7), box_at(boxes, 1, 8))
-    if b.x == 8 and b.y == 0:
-        return (box_at(boxes, 7, 0), box_at(boxes, 8, 1))
-    if b.x == 8 and b.y == 8:
-        return (box_at(boxes, 7, 8), box_at(boxes, 8, 7))
-    if b.x > 0 and b.x < 8 and b.y > 0:
-        return (box_at(boxes, b.x, b.y-1), box_at(boxes, b.x-1, b.y), box_at(boxes, b.x+1, b.y), box_at(boxes, b.x, b.y+1))
-    if b.x == 0 and b.y > 0 and b.y < 8:
-        return (box_at(boxes, b.x, b.y-1), box_at(boxes, b.x, b.y+1), box_at(boxes, b.x+1, b.y))
-    if b.x == 8 and b.y > 0 and b.y < 8:
-        return (box_at(boxes, b.x-1, b.y), box_at(boxes, b.x, b.y-1), box_at(boxes, b.x, b.y+1))
-    if b.y == 0 and b.x > 0 and b.x < 8:
-        return (box_at(boxes, b.x - 1, b.y), box_at(boxes, b.x+1, b.y), box_at(boxes, b.x, b.y+1))
-    if b.y == 8 and b.x > 0 and b.x < 8:
-        return (box_at(boxes, b.x - 1, b.y), box_at(boxes, b.x+1, b.y), box_at(boxes, b.x, b.y-1))
+    return (box_at(boxes, b.x, b.y-1), box_at(boxes, b.x-1, b.y), box_at(boxes, b.x+1, b.y), box_at(boxes, b.x, b.y+1))
 
 
 def path_find(obj, b):
@@ -293,10 +253,10 @@ def path_find(obj, b):
         if bo and get_warn(obj[0], bo) == 0:
             bo.flag = 0
     for bo2 in warnInteger(obj[0], b):
-        print(bo2)
-        w = get_warn(obj[0], bo2)
-        if w > 0 and w < 9:
-            bo2.flag = w
+        if bo2:
+            w = get_warn(obj[0], bo2)
+            if w > 0 and w < 9:
+                bo2.flag = w
     obj[2].append(b)
 
 
