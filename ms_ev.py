@@ -1,6 +1,5 @@
 """Trains AI to play minesweeper using an evolutionary algorithm
 """
-from asyncio.windows_events import NULL
 import sys
 from random import randrange, seed
 from ctypes import windll
@@ -19,14 +18,14 @@ from interfaces.model_interface import (
 seed(1)
 
 # Initialize models
-MODEL_COUNT = 10
+MODEL_COUNT = 200
 SURVIVOR_COUNT = int(MODEL_COUNT * 0.20)
 SAVE_REQUIREMENT_RATIO = 0.95
-GAME_SPACER = 5
+GAME_SPACER = 10
 CYCLE_COUNTER = 0
 SEED = 0
-SHAPE = [81, 5, 1]
-ACT_FUNCTS = [4, 2]
+SHAPE = [81, 10, 10, 1]
+ACT_FUNCTS = [4, 4, 2]
 MUTATION_RATE = 0.5
 MUTATION_DEGREE = 0.25
 OBJECTS = []
@@ -55,9 +54,9 @@ with open("Data/" + fname + "_LOG.txt", "a+", encoding="utf8") as f:
         + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         + "\t"
         + str(CYCLE_COUNTER)
-        + f"\tto save:  {int(SAVE_REQUIREMENT_RATIO)}, pool size = {MODEL_COUNT},\
+        + f"\tto save:  {(SAVE_REQUIREMENT_RATIO * 81)}, pool size = {MODEL_COUNT},\
 survivor count = {SURVIVOR_COUNT}, games per cycle = {GAME_SPACER},\
-mutation rate = {MUTATION_RATE}, mutation degree = {MUTATION_DEGREE}"
+mutation rate = {MUTATION_RATE}, mutation degree = {MUTATION_DEGREE}\n"
     )
 
 
@@ -85,7 +84,7 @@ def get_mutations(survivors):
             + "\t"
             + str(CYCLE_COUNTER)
             + "\t["
-            + ",".join([str(t[1]) for t in top])
+            + ",".join([str(t[3]) for t in top])
             + "]\n"
         )
 
@@ -345,7 +344,7 @@ while True:
 
     for index, objec in enumerate(OBJECTS):
         draw_boxes(objec)
-        if objec[4] < 5:
+        if objec[4] < GAME_SPACER:
             boxes1d = []
             for box_elem in objec[0]:
                 boxes1d.append(box_elem.flag)
