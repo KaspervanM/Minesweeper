@@ -6,7 +6,7 @@ from ctypes import windll
 from operator import itemgetter
 from datetime import datetime
 from pygame.locals import Rect
-import pygame
+import pygame as pg
 from interfaces.model_interface import (
     Model,
     feedforward,
@@ -116,15 +116,24 @@ def message_box(title, text, style):
     return windll.user32.MessageBoxW(0, text, title, style)
 
 
+<<<<<<< HEAD
 pygame.init()
 bomb = pygame.image.load("resources/bomb.png")
 pygame.display.set_icon(bomb)
 surfObj = pygame.display.set_mode((173, 200))
 pygame.display.set_caption("Minesweeper")
+=======
+pg.init()
+mine = pg.image.load("images/mine.png")
+pg.display.set_icon(pg.image.load("images/icon.png"))
+surfObj = pg.display.set_mode((173, 200))
+pg.display.set_caption("Minesweeper")
+>>>>>>> 6a696c5a7a81f498bcc31f24592184ce06cf26fd
 
-white = pygame.Color(255, 255, 255)
-black = pygame.Color(0, 0, 0)
+white = pg.Color(255, 255, 255)
+black = pg.Color(0, 0, 0)
 
+<<<<<<< HEAD
 blockSurf = pygame.image.load("resources/block.png")
 blockSurfSel = pygame.image.load("resources/selblock.png")
 blockSurfBlank = pygame.image.load("resources/blankblock.png")
@@ -138,6 +147,20 @@ warn6 = pygame.image.load("resources/block6.png")
 warn7 = pygame.image.load("resources/block7.png")
 warn8 = pygame.image.load("resources/block8.png")
 explode = pygame.image.load("resources/explode.png")
+=======
+blockSurf = pg.image.load("images/block.png")
+blockSurfBlank = pg.image.load("images/blankblock.png")
+
+warn1 = pg.image.load("images/block1.png")
+warn2 = pg.image.load("images/block2.png")
+warn3 = pg.image.load("images/block3.png")
+warn4 = pg.image.load("images/block4.png")
+warn5 = pg.image.load("images/block5.png")
+warn6 = pg.image.load("images/block6.png")
+warn7 = pg.image.load("images/block7.png")
+warn8 = pg.image.load("images/block8.png")
+explode = pg.image.load("images/explode.png")
+>>>>>>> 6a696c5a7a81f498bcc31f24592184ce06cf26fd
 
 
 class Box():
@@ -159,10 +182,10 @@ selBlock = refBlock
 
 
 def draw_box():
-    pygame.draw.line(surfObj, black, (10, 10), (163, 10))
-    pygame.draw.line(surfObj, black, (10, 10), (10, 163))
-    pygame.draw.line(surfObj, black, (10, 163), (163, 163))
-    pygame.draw.line(surfObj, black, (163, 10), (163, 163))
+    pg.draw.line(surfObj, black, (10, 10), (163, 10))
+    pg.draw.line(surfObj, black, (10, 10), (10, 163))
+    pg.draw.line(surfObj, black, (10, 163), (163, 163))
+    pg.draw.line(surfObj, black, (163, 10), (163, 163))
 
 
 def draw_boxes_init(obj):
@@ -292,9 +315,9 @@ while True:
 
     draw_box()
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            pg.quit()
             sys.exit()
 
     for index, objec in enumerate(OBJECTS):
@@ -322,10 +345,6 @@ while True:
                     path_find(objec, selBlock)
                 if selBlock.isBomb:
                     selBlock.flag = 9
-
-                if selBlock.flag == -3:
-                    surfObj.blit(blockSurfSel, selBlock.box_pos)
-
         elif all(obj[4] == GAME_SPACER for obj in OBJECTS):
             CYCLE_COUNTER += 1
             print("MUTATE_--------------------")
@@ -333,5 +352,5 @@ while True:
             for obje in OBJECTS:
                 resetGame(obje)
 
-    pygame.display.update()
-    # pygame.time.Clock().tick(30)
+    pg.display.update()
+    # pg.time.Clock().tick(30)
