@@ -122,14 +122,8 @@ pygame.display.set_icon(bomb)
 surfObj = pygame.display.set_mode((173, 200))
 pygame.display.set_caption("Minesweeper")
 
-red = pygame.Color(255, 0, 0)
-green = pygame.Color(0, 255, 0)
-
-blue = pygame.Color(0, 0, 255)
 white = pygame.Color(255, 255, 255)
 black = pygame.Color(0, 0, 0)
-
-font = pygame.font.Font("UniversLTStd-BoldEx.otf", 18)
 
 blockSurf = pygame.image.load("block.png")
 blockSurfSel = pygame.image.load("selblock.png")
@@ -144,9 +138,6 @@ warn6 = pygame.image.load("block6.png")
 warn7 = pygame.image.load("block7.png")
 warn8 = pygame.image.load("block8.png")
 explode = pygame.image.load("explode.png")
-question = pygame.image.load("question.png")
-
-clock = pygame.image.load("time.png")
 
 
 class Box():
@@ -208,8 +199,6 @@ def draw_boxes(obj):
             surfObj.blit(explode, b.box_pos)
             lose(obj)
             return
-        elif b.flag == -1:
-            surfObj.blit(question, b.box_pos)
         elif b.flag == 1:
             surfObj.blit(warn1, b.box_pos)
         elif b.flag == 2:
