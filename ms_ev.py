@@ -17,22 +17,24 @@ from interfaces.model_interface import (
 
 seed(1)
 
+DISPLAY_SCREEN = False
+
 # Initialize models
-MODEL_COUNT = 200
+MODEL_COUNT = 100
 SURVIVOR_COUNT = int(MODEL_COUNT * 0.20)
-SAVE_REQUIREMENT_RATIO = 0.95
+SAVE_REQUIREMENT_RATIO = 0.8
 GAME_SPACER = 10
 CYCLE_COUNTER = 0
 SEED = 0
-SHAPE = [81, 10, 10, 2]
-ACT_FUNCTS = [4, 4, 2]
+SHAPE = [81, 10, 3]
+ACT_FUNCTS = [4, 2]
 MUTATION_RATE = 0.5
 MUTATION_DEGREE = 0.25
 OBJECTS = []
 for i in range(MODEL_COUNT):
-    # boxes, blocksleft, checkedBoxes, fitness, gamecount, model, clickCounter
+    # boxes, blocksleft, checkedBoxes, fitness, gamecount, model, clickCounter, flagsUsed
     OBJECTS.append([[], 0, [], 0, 0, Model(
-        SEED + i, len(SHAPE), SHAPE, ACT_FUNCTS), 0])
+        SEED + i, len(SHAPE), SHAPE, ACT_FUNCTS), 0, 0])
 print(OBJECTS)
 print(len(OBJECTS))
 
@@ -54,7 +56,7 @@ with open("Data/" + fname + "_LOG.txt", "a+", encoding="utf8") as f:
         + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         + "\t"
         + str(CYCLE_COUNTER)
-        + f"\tto save:  {(SAVE_REQUIREMENT_RATIO * (81 - 10))}, pool size = {MODEL_COUNT}, \
+        + f"\tto save:  {(SAVE_REQUIREMENT_RATIO * 10)}, pool size = {MODEL_COUNT}, \
 survivor count = {SURVIVOR_COUNT}, games per cycle = {GAME_SPACER}, \
 mutation rate = {MUTATION_RATE}, mutation degree = {MUTATION_DEGREE}\n"
     )
@@ -74,7 +76,6 @@ def get_mutations(survivors):
     top_ = sorted(OBJECTS, key=itemgetter(3), reverse=True)
     top = top_[:survivors]
     freeModel([o[5] for o in top_[survivors:]])
-    #print("TOP: ", top)
 
     print("Top scores: ", [t[3] for t in top])
 
@@ -96,7 +97,7 @@ def get_mutations(survivors):
     new_objects = []
     #OBJECTS.append([[], 0, [], 0, 0, Model( SEED + i, len(SHAPE), SHAPE, ACT_FUNCTS), 0])
     for top_index in range(survivors):
-        new_objects.append([[], 0, [], 0, 0, top[top_index][5], 0])
+        new_objects.append([[], 0, [], 0, 0, top[top_index][5], 0, 0])
         for new_obj_index in range(int(new_count / survivors + 0.5)):
             new_objects.append(
                 [[], 0, [], 0, 0,
@@ -106,7 +107,7 @@ def get_mutations(survivors):
                             SEED + top_index + new_obj_index,
                             MUTATION_RATE,
                             MUTATION_DEGREE,
-                        )), 0
+                        )), 0, 0
                  ]
             )
     return new_objects[:MODEL_COUNT]
@@ -136,12 +137,13 @@ warn5 = pg.image.load("images/block5.png")
 warn6 = pg.image.load("images/block6.png")
 warn7 = pg.image.load("images/block7.png")
 warn8 = pg.image.load("images/block8.png")
+flag = pg.image.load("images/flag.png")
 explode = pg.image.load("images/explode.png")
 
 
 class Box():
     # flag = -3 # -3 = NO FLAG; -2 = FLAGGED; -1 = ?; 0 = BLANK; 1-8 = WARN; 9 = Exploded
-    isBomb = False
+    is_bomb = False
     index = 0
     x = 0
     y = 0
@@ -172,15 +174,16 @@ def draw_boxes_init(obj):
             bo.x = x
             bo.y = y
             obj[0].append(bo)
-            surfObj.blit(blockSurf, (x*17 + 10, y*17 + 10))
+            if DISPLAY_SCREEN:
+                surfObj.blit(blockSurf, (x*17 + 10, y*17 + 10))
 
 
 def pick_bombs(obj):
     num_bombs = 0
     while num_bombs < 10:   # CHange to 10
         x = randrange(0, len(obj[0]))
-        if not obj[0][x].isBomb:
-            obj[0][x].isBomb = True
+        if not obj[0][x].is_bomb:
+            obj[0][x].is_bomb = True
             num_bombs += 1
 
 
@@ -189,31 +192,47 @@ def draw_boxes(obj):
     for b in obj[0]:
         if b.flag == -3:
             obj[1] += 1
-            surfObj.blit(blockSurf, b.box_pos)
+            if DISPLAY_SCREEN:
+                surfObj.blit(blockSurf, b.box_pos)
         elif b.flag == 0:
             if not b in obj[2]:
                 path_find(obj, b)
-            surfObj.blit(blockSurfBlank, b.box_pos)
+            if DISPLAY_SCREEN:
+                surfObj.blit(blockSurfBlank, b.box_pos)
         elif b.flag == 9:
-            surfObj.blit(explode, b.box_pos)
+            if DISPLAY_SCREEN:
+                surfObj.blit(explode, b.box_pos)
             lose(obj)
             return
+        elif b.flag == -2:
+            if DISPLAY_SCREEN:
+                surfObj.blit(flag, b.box_pos)
+            obj[1] += 1
+            obj[7] += 1
         elif b.flag == 1:
-            surfObj.blit(warn1, b.box_pos)
+            if DISPLAY_SCREEN:
+                surfObj.blit(warn1, b.box_pos)
         elif b.flag == 2:
-            surfObj.blit(warn2, b.box_pos)
+            if DISPLAY_SCREEN:
+                surfObj.blit(warn2, b.box_pos)
         elif b.flag == 3:
-            surfObj.blit(warn3, b.box_pos)
+            if DISPLAY_SCREEN:
+                surfObj.blit(warn3, b.box_pos)
         elif b.flag == 4:
-            surfObj.blit(warn4, b.box_pos)
+            if DISPLAY_SCREEN:
+                surfObj.blit(warn4, b.box_pos)
         elif b.flag == 5:
-            surfObj.blit(warn5, b.box_pos)
+            if DISPLAY_SCREEN:
+                surfObj.blit(warn5, b.box_pos)
         elif b.flag == 6:
-            surfObj.blit(warn6, b.box_pos)
+            if DISPLAY_SCREEN:
+                surfObj.blit(warn6, b.box_pos)
         elif b.flag == 7:
-            surfObj.blit(warn7, b.box_pos)
+            if DISPLAY_SCREEN:
+                surfObj.blit(warn7, b.box_pos)
         elif b.flag == 8:
-            surfObj.blit(warn8, b.box_pos)
+            if DISPLAY_SCREEN:
+                surfObj.blit(warn8, b.box_pos)
     if obj[1] == 10:
         win(obj)
 
@@ -235,7 +254,7 @@ def get_warn(boxes, b):
     if not neighbors:
         return 0
     for boxelem in neighbors:
-        if boxelem and boxelem.isBomb:
+        if boxelem and boxelem.is_bomb:
             warn += 1
     return warn
 
@@ -259,9 +278,20 @@ def path_find(obj, b):
     obj[2].append(b)
 
 
+def get_fintess(obj):
+    fitness = 0
+    for box_el in obj[0]:
+        if box_el.flag is -2:
+            if box_el.is_bomb:
+                fitness += 1
+            else:
+                fitness -= 1
+    return fitness
+
+
 def lose(obj):
     #message_box("Sorry, you lost!", "You lose!  " + str(OBJECTS.index(obj)), 0)
-    obj[3] += (81 - 10 - obj[1]) / GAME_SPACER  # fitness
+    obj[3] += get_fintess(obj) / GAME_SPACER  # fitness
     obj[4] += 1  # gamecount
     resetGame(obj)
 
@@ -269,7 +299,7 @@ def lose(obj):
 def win(obj):
     print("win!")
     #message_box("Congrats, you won!", "You win!  " + str(obj[1]), 0)
-    obj[3] += (81 - 10 - obj[1]) / GAME_SPACER  # fitness
+    obj[3] += get_fintess(obj) / GAME_SPACER  # fitness
     obj[4] += 1
     resetGame(obj)
 
@@ -279,6 +309,7 @@ def resetGame(obj):
     obj[1] = 0
     obj[2] = []
     obj[6] = 0
+    obj[7] = 0
     draw_boxes_init(obj)
     pick_bombs(obj)
 
@@ -308,19 +339,23 @@ while True:
             output = feedforward(objec[5], boxes1d)
             # [int(output // 9 - .5), int(output % 9 - .5)]
             coords = [int(output[0]*8), int(output[1]*8)]
+            doflag = bool(int(output[1] + .5))
             objec[6] += 1
-            if objec[6] == 81 - 20:
+            if objec[6] == 81:
                 lose(objec)
             else:
                 #print(index, ": ", objec[1], ", ", coords)
                 selBlock = box_at(objec[0], coords[0], coords[1])
 
-                selBlock.flag = get_warn(objec[0], selBlock)
-                if selBlock.flag == 0:
-                    boxesToPath.append(selBlock)
-                    path_find(objec, selBlock)
-                if selBlock.isBomb:
-                    selBlock.flag = 9
+                if doflag:
+                    selBlock.flag = -2
+                else:
+                    selBlock.flag = get_warn(objec[0], selBlock)
+                    if selBlock.flag == 0:
+                        boxesToPath.append(selBlock)
+                        path_find(objec, selBlock)
+                    if selBlock.is_bomb:
+                        selBlock.flag = 9
         elif all(obj[4] == GAME_SPACER for obj in OBJECTS):
             CYCLE_COUNTER += 1
             print("MUTATE_--------------------")
@@ -328,5 +363,5 @@ while True:
             for obje in OBJECTS:
                 resetGame(obje)
 
-    pg.display.update()
+    # pg.display.update()
     # pg.time.Clock().tick(30)
