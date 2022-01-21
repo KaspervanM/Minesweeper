@@ -24,7 +24,7 @@ SAVE_REQUIREMENT_RATIO = 0.95
 GAME_SPACER = 10
 CYCLE_COUNTER = 0
 SEED = 0
-SHAPE = [81, 10, 10, 1]
+SHAPE = [81, 10, 10, 2]
 ACT_FUNCTS = [4, 4, 2]
 MUTATION_RATE = 0.5
 MUTATION_DEGREE = 0.25
@@ -305,9 +305,9 @@ while True:
 
             # process
 
-            output = feedforward(objec[5], boxes1d)[0]
-            output *= 81
-            coords = [int(output // 9 - .5), int(output % 9 - .5)]
+            output = feedforward(objec[5], boxes1d)
+            # [int(output // 9 - .5), int(output % 9 - .5)]
+            coords = [int(output[0]*8), int(output[1]*8)]
             objec[6] += 1
             if objec[6] == 81 - 20:
                 lose(objec)
