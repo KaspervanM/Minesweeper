@@ -13,7 +13,7 @@ SHAPE = [81, 10, 3]
 ACT_FUNCTS = [4, 2]
 
 MODEL = Model(SEED, len(SHAPE), SHAPE, ACT_FUNCTS)
-PATH_TO_FILE = "saves/model-test.txt"
+PATH_TO_FILE = "saves/_SEED0_s81-10-10-3_a4-4-2.txt"
 load_model(MODEL, PATH_TO_FILE)
 
 
