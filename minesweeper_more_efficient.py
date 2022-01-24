@@ -1,173 +1,170 @@
-import pygame as pg
 import sys
 from random import randrange
-from pygame.locals import *
 from ctypes import windll
+import pygame as pg
+from pygame.locals import Rect, QUIT, MOUSEBUTTONUP
 
 
-def MessageBox(title, text, style):
+def message_box(title, text, style):
     return windll.user32.MessageBoxW(0, text, title, style)
 
 
 pg.init()
-mine = pg.image.load("images/mine.png")
+MINE = pg.image.load("images/MINE.png")
 pg.display.set_icon(pg.image.load("images/icon.png"))
-surfObj = pg.display.set_mode((173, 200))
+SURF_OBJ = pg.display.set_mode((173, 200))
 pg.display.set_caption("Minesweeper")
 
-red = pg.Color(255, 0, 0)
-green = pg.Color(0, 255, 0)
+WHITE = pg.Color(255, 255, 255)
+BLACK = pg.Color(0, 0, 0)
 
-blue = pg.Color(0, 0, 255)
-white = pg.Color(255, 255, 255)
-black = pg.Color(0, 0, 0)
+FONT = pg.font.Font("resources/UniversLTStd-BoldEx.otf", 18)
 
-font = pg.font.Font("resources/UniversLTStd-BoldEx.otf", 18)
+BLOCK_SURF = pg.image.load("images/block.png")
+BLOCK_SURF_BLANK = pg.image.load("images/blankblock.png")
 
-blockSurf = pg.image.load("images/block.png")
-blockSurfBlank = pg.image.load("images/blankblock.png")
+WARN_1 = pg.image.load("images/block1.png")
+WARN_2 = pg.image.load("images/block2.png")
+WARN_3 = pg.image.load("images/block3.png")
+WARN_4 = pg.image.load("images/block4.png")
+WARN_5 = pg.image.load("images/block5.png")
+WARN_6 = pg.image.load("images/block6.png")
+WARN_7 = pg.image.load("images/block7.png")
+WARN_8 = pg.image.load("images/block8.png")
+EXPLODE = pg.image.load("images/explode.png")
+FLAG = pg.image.load("images/flag.png")
+QUESTION = pg.image.load("images/question.png")
 
-warn1 = pg.image.load("images/block1.png")
-warn2 = pg.image.load("images/block2.png")
-warn3 = pg.image.load("images/block3.png")
-warn4 = pg.image.load("images/block4.png")
-warn5 = pg.image.load("images/block5.png")
-warn6 = pg.image.load("images/block6.png")
-warn7 = pg.image.load("images/block7.png")
-warn8 = pg.image.load("images/block8.png")
-explode = pg.image.load("images/explode.png")
-flag = pg.image.load("images/flag.png")
-question = pg.image.load("images/question.png")
+CLOCK = pg.image.load("images/time.png")
 
-clock = pg.image.load("images/time.png")
-
-boxes = []
-numBombs = 0
+BOXES = []
+NUM_BOMBS = 0
 
 
-class box():
+class Box():
     # flag = -3 # -3 = NO FLAG; -2 = FLAGGED; -1 = ?; 0 = BLANK; 1-8 = WARN; 9 = Exploded
-    isBomb = False
+    is_bomb = False
     index = 0
-    x = 0
-    y = 0
+    x_coords = 0
+    y_coords = 0
 
-    def __init__(self, boxPos):
-        self.boxP = boxPos
+    def __init__(self, box_pos):
+        self.box_pos = box_pos
         self.flag = -3
 
 
-refBlock = box(Rect(-100, -100, 0, 0))
-refBlock.x = -10
-refBlock.y = -10
-selBlock = refBlock
+def draw_box():
+    pg.draw.line(SURF_OBJ, BLACK, (10, 10), (163, 10))
+    pg.draw.line(SURF_OBJ, BLACK, (10, 10), (10, 163))
+    pg.draw.line(SURF_OBJ, BLACK, (10, 163), (163, 163))
+    pg.draw.line(SURF_OBJ, BLACK, (163, 10), (163, 163))
 
 
-def drawBox():
-    pg.draw.line(surfObj, black, (10, 10), (163, 10))
-    pg.draw.line(surfObj, black, (10, 10), (10, 163))
-    pg.draw.line(surfObj, black, (10, 163), (163, 163))
-    pg.draw.line(surfObj, black, (163, 10), (163, 163))
+def draw_box_init():
+    for x_coords in range(0, 9):
+        for y_coords in range(0, 9):
+            box_ob = Box(Rect(x_coords*17+10, y_coords*17+10, 17, 17))
+            box_ob.index = len(BOXES)
+            box_ob.x_coords = x_coords
+            box_ob.y_coords = y_coords
+            BOXES.append(box_ob)
+            SURF_OBJ.blit(BLOCK_SURF, (x_coords*17 + 10, y_coords*17 + 10))
 
 
-def drawBoxesInit():
-    for x in range(0, 9):
-        for y in range(0, 9):
-            bo = box(Rect(x*17+10, y*17+10, 17, 17))
-            bo.index = len(boxes)
-            bo.x = x
-            bo.y = y
-            boxes.append(bo)
-            surfObj.blit(blockSurf, (x*17 + 10, y*17 + 10))
+draw_box_init()
 
 
-drawBoxesInit()
+def pick_bombs():
+    global NUM_BOMBS
+    while NUM_BOMBS < 10:
+        x_coords = randrange(0, len(BOXES))
+        if not BOXES[x_coords].is_bomb:
+            BOXES[x_coords].is_bomb = True
+            NUM_BOMBS += 1
 
 
-def pickBombs():
-    global numBombs
-    while numBombs < 10:
-        x = randrange(0, len(boxes))
-        if not boxes[x].isBomb:
-            boxes[x].isBomb = True
-            numBombs += 1
+pick_bombs()
+FLAGS_USED = 0
+CHECKED_BOXES = []
+BLOCKS_LEFT = 0
 
 
-pickBombs()
-flagsUsed = 0
-checkedBoxes = []
-blocksLeft = 0
-
-
-def drawBoxes():
-    global flagsUsed
-    global blocksLeft
-    flagsUsed = 0
-    blocksLeft = 0
-    for b in boxes:
-        if b.flag == -3:
-            blocksLeft += 1
-            surfObj.blit(blockSurf, b.boxP)
-        elif b.flag == 0:
-            if not b in checkedBoxes:
-                pathFind(b)
-            surfObj.blit(blockSurfBlank, b.boxP)
-        elif b.flag == 9:
-            surfObj.blit(explode, b.boxP)
+def draw_boxes():
+    global FLAGS_USED
+    global BLOCKS_LEFT
+    FLAGS_USED = 0
+    BLOCKS_LEFT = 0
+    for box_ob in BOXES:
+        if box_ob.flag == -3:
+            BLOCKS_LEFT += 1
+            SURF_OBJ.blit(BLOCK_SURF, box_ob.box_pos)
+        elif box_ob.flag == 0:
+            if not box_ob in CHECKED_BOXES:
+                path_find(box_ob)
+            SURF_OBJ.blit(BLOCK_SURF_BLANK, box_ob.box_pos)
+        elif box_ob.flag == 9:
+            SURF_OBJ.blit(EXPLODE, box_ob.box_pos)
             lose()
-        elif b.flag == -2:
-            surfObj.blit(flag, b.boxP)
-            blocksLeft += 1
-            flagsUsed += 1
-        elif b.flag == -1:
-            surfObj.blit(question, b.boxP)
-        elif b.flag == 1:
-            surfObj.blit(warn1, b.boxP)
-        elif b.flag == 2:
-            surfObj.blit(warn2, b.boxP)
-        elif b.flag == 3:
-            surfObj.blit(warn3, b.boxP)
-        elif b.flag == 4:
-            surfObj.blit(warn4, b.boxP)
-        elif b.flag == 5:
-            surfObj.blit(warn5, b.boxP)
-        elif b.flag == 6:
-            surfObj.blit(warn6, b.boxP)
-        elif b.flag == 7:
-            surfObj.blit(warn7, b.boxP)
-        elif b.flag == 8:
-            surfObj.blit(warn8, b.boxP)
-    if blocksLeft == 10:
+        elif box_ob.flag == -2:
+            SURF_OBJ.blit(FLAG, box_ob.box_pos)
+            BLOCKS_LEFT += 1
+            FLAGS_USED += 1
+        elif box_ob.flag == -1:
+            SURF_OBJ.blit(QUESTION, box_ob.box_pos)
+        elif box_ob.flag == 1:
+            SURF_OBJ.blit(WARN_1, box_ob.box_pos)
+        elif box_ob.flag == 2:
+            SURF_OBJ.blit(WARN_2, box_ob.box_pos)
+        elif box_ob.flag == 3:
+            SURF_OBJ.blit(WARN_3, box_ob.box_pos)
+        elif box_ob.flag == 4:
+            SURF_OBJ.blit(WARN_4, box_ob.box_pos)
+        elif box_ob.flag == 5:
+            SURF_OBJ.blit(WARN_5, box_ob.box_pos)
+        elif box_ob.flag == 6:
+            SURF_OBJ.blit(WARN_6, box_ob.box_pos)
+        elif box_ob.flag == 7:
+            SURF_OBJ.blit(WARN_7, box_ob.box_pos)
+        elif box_ob.flag == 8:
+            SURF_OBJ.blit(WARN_8, box_ob.box_pos)
+    if BLOCKS_LEFT == 10:
         win()
 
 
-def isInBounds():
-    return Rect(10, 10, 153, 153).collidepoint(e.pos)
+def is_in_bounds(event):
+    return Rect(10, 10, 153, 153).collidepoint(event.pos)
 
 
-def overBlock():
-    for b in boxes:
-        if b.boxP.collidepoint(e.pos):
-            return b
+def over_block(pos):
+    for box_ob in BOXES:
+        if box_ob.box_pos.collidepoint(pos):
+            return box_ob
 
 
-def boxAt(x, y):
-    for b in boxes:
-        if b.x == x and b.y == y:
-            return b
+def box_at(x_coords, y_coords):
+    for box_ob in BOXES:
+        if box_ob.x_coords == x_coords and box_ob.y_coords == y_coords:
+            return box_ob
 
 
-def warnInteger(b):
-    return (boxAt(b.x - 1, b.y), boxAt(b.x + 1, b.y), boxAt(b.x, b.y - 1), boxAt(b.x, b.y + 1), boxAt(b.x - 1, b.y - 1), boxAt(b.x + 1, b.y + 1), boxAt(b.x + 1, b.y - 1), boxAt(b.x - 1, b.y + 1))
+def warn_integer(box_ob):
+    return (box_at(box_ob.x_coords - 1, box_ob.y_coords),
+            box_at(box_ob.x_coords + 1, box_ob.y_coords),
+            box_at(box_ob.x_coords, box_ob.y_coords - 1),
+            box_at(box_ob.x_coords, box_ob.y_coords + 1),
+            box_at(box_ob.x_coords - 1, box_ob.y_coords - 1),
+            box_at(box_ob.x_coords + 1, box_ob.y_coords + 1),
+            box_at(box_ob.x_coords + 1, box_ob.y_coords - 1),
+            box_at(box_ob.x_coords - 1, box_ob.y_coords + 1))
 
 
-def getWarn(b):
+def get_warn(box_ob):
     warn = 0
-    neighbors = warnInteger(b)
+    neighbors = warn_integer(box_ob)
     if not neighbors:
         return 0
-    for b in neighbors:
-        if b and b.isBomb:
+    for neighbors_box_ob in neighbors:
+        if neighbors_box_ob and neighbors_box_ob.is_bomb:
             warn = warn + 1
     return warn
 
@@ -175,112 +172,114 @@ def getWarn(b):
 boxesToPath = []
 
 
-def crossFind(b):
-    return (boxAt(b.x, b.y-1), boxAt(b.x-1, b.y), boxAt(b.x+1, b.y), boxAt(b.x, b.y+1))
+def cross_find(box_ob):
+    return (box_at(box_ob.x_coords, box_ob.y_coords-1),
+            box_at(box_ob.x_coords-1, box_ob.y_coords),
+            box_at(box_ob.x_coords+1, box_ob.y_coords),
+            box_at(box_ob.x_coords, box_ob.y_coords+1))
 
 
-def pathFind(b):
-    for bo in crossFind(b):
-        if bo and getWarn(bo) == 0:
-            bo.flag = 0
-    for bo2 in warnInteger(b):
+def path_find(box_ob):
+    for box_elem in cross_find(box_ob):
+        if box_elem and get_warn(box_elem) == 0:
+            box_elem.flag = 0
+    for bo2 in warn_integer(box_ob):
         if bo2:
-            w = getWarn(bo2)
-            if w > 0 and w < 9:
-                bo2.flag = w
-    checkedBoxes.append(b)
+            warn = get_warn(bo2)
+            if 0 < warn < 9:
+                bo2.flag = warn
+    CHECKED_BOXES.append(box_ob)
 
 
-lastGame = 0
+LAST_GAME = 0
 
 
 def lose():
-    MessageBox("Sorry, you lost!", "You lose!", 0)
-    resetGame()
+    message_box("Sorry, you lost!", "You lose!", 0)
+    reset_game()
 
 
 def win():
-    MessageBox("Congrats, you won!", "You win!", 0)
-    resetGame()
+    message_box("Congrats, you won!", "You win!", 0)
+    reset_game()
 
 
-def resetGame():
-    global boxes
-    global numBombs
-    global flagsUsed
-    global checkedBoxes
-    global blocksLeft
-    global lastGame
-    boxes[:] = []
-    numBombs = 0
-    drawBoxesInit()
-    pickBombs()
-    flagsUsed = 0
-    checkedBoxes = []
-    blocksLeft = 0
-    lastGame = pg.time.get_ticks()
+def reset_game():
+    global BOXES
+    global NUM_BOMBS
+    global FLAGS_USED
+    global CHECKED_BOXES
+    global BLOCKS_LEFT
+    global LAST_GAME
+    BOXES[:] = []
+    NUM_BOMBS = 0
+    draw_box_init()
+    pick_bombs()
+    FLAGS_USED = 0
+    CHECKED_BOXES = []
+    BLOCKS_LEFT = 0
+    LAST_GAME = pg.time.get_ticks()
 
 
-while True:
-    surfObj.fill(white)
-    surfObj.blit(clock, (10, 173))
-    surfObj.blit(mine, (147, 173))
+def game_loop():
+    SURF_OBJ.fill(WHITE)
+    SURF_OBJ.blit(CLOCK, (10, 173))
+    SURF_OBJ.blit(MINE, (147, 173))
 
-    m = font.render(str(10-flagsUsed), True, black)
-    mp = m.get_rect()
-    mp.topleft = (120, 173)
-    surfObj.blit(m, mp)
-    ticks = 0
-    if not lastGame == 0:
-        mins = (pg.time.get_ticks() - lastGame) / 1000 / 60
-        secs = (pg.time.get_ticks() - lastGame) / 1000 % 60
+    mine_text = FONT.render(str(10-FLAGS_USED), True, BLACK)
+    mine_text_pos = mine_text.get_rect()
+    mine_text_pos.topleft = (120, 173)
+    SURF_OBJ.blit(mine_text, mine_text_pos)
+    if LAST_GAME != 0:
+        mins = (pg.time.get_ticks() - LAST_GAME) / 1000 / 60
+        secs = (pg.time.get_ticks() - LAST_GAME) / 1000 % 60
     else:
         mins = pg.time.get_ticks() / 1000 / 60
         secs = pg.time.get_ticks() / 1000 % 60
-    minsS = ""
-    secsS = ""
+    mins_string = ""
+    secs_string = ""
     if secs < 10:
-        secsS = "0" + str(int(secs))
+        secs_string = "0" + str(int(secs))
     else:
-        secsS = str(int(secs))
+        secs_string = str(int(secs))
     if mins < 10:
-        minsS = "0" + str(int(mins))
+        mins_string = "0" + str(int(mins))
     else:
-        minsS = str(int(mins))
+        mins_string = str(int(mins))
 
-    m2 = font.render(minsS + ":" + secsS, True, black)
-    mp2 = m2.get_rect()
-    mp2.topleft = (30, 173)
-    surfObj.blit(m2, mp2)
+    min_text = FONT.render(mins_string + ":" + secs_string, True, BLACK)
+    min_text_pos = min_text.get_rect()
+    min_text_pos.topleft = (30, 173)
+    SURF_OBJ.blit(min_text, min_text_pos)
 
-    drawBox()
-    drawBoxes()
+    draw_box()
+    draw_boxes()
 
-    for e in pg.event.get():
-        if e.type == QUIT:
+    for pg_event in pg.event.get():
+        if pg_event.type == QUIT:
             pg.quit()
             sys.exit()
-        elif e.type == MOUSEMOTION:
-            selBlock = overBlock()
-            if not isInBounds():
-
-                selBlock = refBlock
-        elif e.type == MOUSEBUTTONUP:
-            if isInBounds():
-                if e.button == 1:
-                    selBlock.flag = getWarn(selBlock)
-                    if selBlock.flag == 0:
-                        boxesToPath.append(selBlock)
-                        pathFind(selBlock)
-                    if selBlock.isBomb:
-                        selBlock.flag = 9
-                elif e.button == 3:
-                    if selBlock.flag == -3:
-                        selBlock.flag = -2
-                    elif selBlock.flag == -2:
-                        selBlock.flag = -1
-                    elif selBlock.flag == -1:
-                        selBlock.flag = -3
+        elif pg_event.type == MOUSEBUTTONUP:
+            if is_in_bounds(pg_event):
+                selected_block = over_block(pg.mouse.get_pos())
+                if pg_event.button == 1:
+                    selected_block.flag = get_warn(selected_block)
+                    if selected_block.flag == 0:
+                        boxesToPath.append(selected_block)
+                        path_find(selected_block)
+                    if selected_block.is_bomb:
+                        selected_block.flag = 9
+                elif pg_event.button == 3:
+                    if selected_block.flag == -3:
+                        selected_block.flag = -2
+                    elif selected_block.flag == -2:
+                        selected_block.flag = -1
+                    elif selected_block.flag == -1:
+                        selected_block.flag = -3
 
     pg.display.update()
     pg.time.Clock().tick(30)
+
+
+while True:
+    game_loop()
