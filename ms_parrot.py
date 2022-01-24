@@ -61,10 +61,9 @@ def close_file():
 
 def remove_line():
     with open("Data/" + FILENAME + ".txt", "r+", encoding="utf8") as file:
-        lines = "".join(file.read().splitlines())[:-1] + "]"
-    print(lines)
+        lines = "\n".join(file.read().splitlines()[:-1])
     with open("Data/" + FILENAME + ".txt", "w+", encoding="utf8") as file:
-        file.write((dumps(loads(lines)[:-1]))[:-1]+",")
+        file.write(lines + "\n")
 
 
 write_file(None)
@@ -144,6 +143,7 @@ def draw_boxes():
         elif box_ob.flag == 9:
             SURF_OBJ.blit(EXPLODE, box_ob.box_pos)
             lose()
+            return
         elif box_ob.flag == -2:
             SURF_OBJ.blit(FLAG, box_ob.box_pos)
             BLOCKS_LEFT += 1
@@ -300,6 +300,9 @@ def game_loop():
             close_file()
             pg.quit()
             sys.exit()
+        elif pg_event.type == pg.KEYDOWN:
+            if pg_event.key == pg.K_SPACE:
+                remove_line()
         elif pg_event.type == MOUSEBUTTONUP:
             if is_in_bounds(pg_event):
                 selected_block = over_block(pg.mouse.get_pos())

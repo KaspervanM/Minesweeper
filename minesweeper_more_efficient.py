@@ -105,6 +105,7 @@ def draw_boxes():
         elif box_ob.flag == 9:
             SURF_OBJ.blit(EXPLODE, box_ob.box_pos)
             lose()
+            return
         elif box_ob.flag == -2:
             SURF_OBJ.blit(FLAG, box_ob.box_pos)
             BLOCKS_LEFT += 1
