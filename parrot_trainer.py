@@ -25,4 +25,4 @@ train_from_file(MODEL,
                 PERCENTAGE_OF_DATA_NOT_TO_TRAIN,
                 TRAINING_DATA_SEED)
 
-save_model(MODEL, "model-test.txt")
+save_model(MODEL, "saves/model-test.txt")
