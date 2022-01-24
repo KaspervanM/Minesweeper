@@ -332,7 +332,7 @@ while True:
         if objec[4] < GAME_SPACER:
             boxes1d = []
             for box_elem in objec[0]:
-                boxes1d.append(box_elem.flag)
+                boxes1d.append((box_elem.flag + 3)/12)
 
             # process
 
@@ -363,5 +363,6 @@ while True:
             for obje in OBJECTS:
                 resetGame(obje)
 
-    # pg.display.update()
+    if DISPLAY_SCREEN:
+        pg.display.update()
     # pg.time.Clock().tick(30)
