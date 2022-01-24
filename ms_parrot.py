@@ -1,6 +1,8 @@
 import sys
 from random import randrange
 from ctypes import windll
+from datetime import datetime
+from json import dumps, loads
 import pygame as pg
 from pygame.locals import Rect, QUIT, MOUSEBUTTONUP
 
@@ -39,6 +41,43 @@ CLOCK = pg.image.load("images/time.png")
 
 BOXES = []
 NUM_BOMBS = 0
+
+FILENAME = datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + "_trainingdata"
+
+
+def write_file(training_data):
+    if training_data:
+        text = dumps(training_data) + ",\n"
+    else:
+        text = "["
+    with open("Data/" + FILENAME + ".txt", "a+", encoding="utf8") as file:
+        file.write(text)
+
+
+def close_file():
+    with open("Data/" + FILENAME + ".txt", "a+", encoding="utf8") as file:
+        file.write("]")
+
+
+def remove_line():
+    with open("Data/" + FILENAME + ".txt", "r+", encoding="utf8") as file:
+        lines = "".join(file.read().splitlines())[:-1] + "]"
+    print(lines)
+    with open("Data/" + FILENAME + ".txt", "w+", encoding="utf8") as file:
+        file.write((dumps(loads(lines)[:-1]))[:-1]+",")
+
+
+write_file(None)
+
+
+def get_training_data(selected_box, has_flagged):
+    input_data = []
+    for box_elem in BOXES:
+        input_data.append((box_elem.flag + 3)/12)
+    desired_output = [selected_box.x_coords / 8,
+                      selected_box.y_coords / 8,
+                      int(has_flagged)]
+    return [input_data, desired_output]
 
 
 class Box():
@@ -196,6 +235,7 @@ LAST_GAME = 0
 
 def lose():
     message_box("Sorry, you lost!", "You lose!", 0)
+    remove_line()
     reset_game()
 
 
@@ -257,12 +297,14 @@ def game_loop():
 
     for pg_event in pg.event.get():
         if pg_event.type == QUIT:
+            close_file()
             pg.quit()
             sys.exit()
         elif pg_event.type == MOUSEBUTTONUP:
             if is_in_bounds(pg_event):
                 selected_block = over_block(pg.mouse.get_pos())
                 if pg_event.button == 1:
+                    write_file(get_training_data(selected_block, False))
                     selected_block.flag = get_warn(selected_block)
                     if selected_block.flag == 0:
                         boxesToPath.append(selected_block)
@@ -270,6 +312,7 @@ def game_loop():
                     if selected_block.is_bomb:
                         selected_block.flag = 9
                 elif pg_event.button == 3:
+                    write_file(get_training_data(selected_block, True))
                     if selected_block.flag == -3:
                         selected_block.flag = -2
                     elif selected_block.flag == -2:
